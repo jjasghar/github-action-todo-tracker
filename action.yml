@@ -1,0 +1,50 @@
+name: 'TODO Tracker'
+description: 'Automatically scan your codebase for TODO comments and create GitHub issues to track them. Never lose track of technical debt again!'
+author: 'jjasghar'
+
+branding:
+  icon: 'list'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for creating issues'
+    required: true
+  repo-name:
+    description: 'Repository name in format owner/repo (auto-detected from context if not provided)'
+    required: false
+    default: ''
+  repo-path:
+    description: 'Path to scan for TODOs'
+    required: false
+    default: '.'
+  close-resolved:
+    description: 'Close issues for TODOs that no longer exist'
+    required: false
+    default: 'false'
+  ignore-dirs:
+    description: 'Comma-separated list of directories to ignore'
+    required: false
+    default: ''
+  ignore-patterns:
+    description: 'Comma-separated list of file patterns to ignore'
+    required: false
+    default: ''
+  dry-run:
+    description: 'Perform a dry run without creating issues'
+    required: false
+    default: 'false'
+
+outputs:
+  todos-found:
+    description: 'Number of TODOs found'
+  issues-created:
+    description: 'Number of new issues created'
+  issues-skipped:
+    description: 'Number of existing TODOs skipped'
+  issues-closed:
+    description: 'Number of resolved issues closed'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

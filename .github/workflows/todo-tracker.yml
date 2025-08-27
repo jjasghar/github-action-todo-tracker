@@ -1,0 +1,37 @@
+name: TODO Tracker
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  track-todos:
+    runs-on: ubuntu-latest
+    name: Track TODOs in codebase
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Run TODO Tracker
+      id: todo-tracker
+      uses: ./
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-path: '.'
+        close-resolved: 'true'
+        ignore-dirs: 'node_modules,build,dist,.pytest_cache'
+        ignore-patterns: '*.pyc,*.log,*.tmp'
+        
+    - name: Print summary
+      run: |
+        echo "TODOs found: ${{ steps.todo-tracker.outputs.todos-found }}"
+        echo "Issues created: ${{ steps.todo-tracker.outputs.issues-created }}"
+        echo "Issues skipped: ${{ steps.todo-tracker.outputs.issues-skipped }}"
+        echo "Issues closed: ${{ steps.todo-tracker.outputs.issues-closed }}"

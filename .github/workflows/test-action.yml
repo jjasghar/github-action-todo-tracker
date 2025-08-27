@@ -1,0 +1,78 @@
+name: Test GitHub Action
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+    
+    - name: Run tests
+      run: |
+        pytest --cov=src/todo_tracker --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: true
+
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Create test TODO file
+      run: |
+        echo "# TODO: This is a test todo for the action" > test_todo.py
+        echo "print('Hello world')  # TODO: Add more features" >> test_todo.py
+    
+    - name: Test the action (dry run)
+      uses: ./
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        dry-run: true
+        repo-path: .
+    
+    - name: Clean up test files
+      run: rm -f test_todo.py
+
+  test-docker-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: docker build -t todo-tracker-test .
+    
+    - name: Test Docker image
+      run: |
+        echo "# TODO: Test docker functionality" > test_docker.py
+        docker run --rm \
+          -v $PWD:/workspace \
+          -e INPUT_GITHUB_TOKEN=dummy_token \
+          -e INPUT_DRY_RUN=true \
+          -e INPUT_REPO_PATH=/workspace \
+          -e GITHUB_REPOSITORY=test/repo \
+          todo-tracker-test || true  # Allow failure for dry run with dummy token
+        rm test_docker.py
