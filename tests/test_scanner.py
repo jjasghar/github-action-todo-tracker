@@ -6,7 +6,6 @@ import tempfile
 import os
 from pathlib import Path
 from typing import List
-
 import pytest
 
 from todo_tracker.scanner import TodoScanner, TodoItem

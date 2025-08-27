@@ -83,7 +83,19 @@ jobs:
         echo "=== Running basic validation tests ==="
         pytest tests/test_basic.py -v
     
-    - name: Run all tests
+    - name: Run tests by module
       run: |
-        echo "=== Running all tests ==="
-        pytest -v --tb=short
+        echo "=== Running basic tests ==="
+        pytest tests/test_basic.py -v --tb=short
+        echo ""
+        echo "=== Running scanner tests ==="
+        pytest tests/test_scanner.py -v --tb=short
+        echo ""
+        echo "=== Running github client tests ==="
+        pytest tests/test_github_client.py -v --tb=short
+        echo ""
+        echo "=== Running CLI tests ==="
+        pytest tests/test_cli.py -v --tb=short
+        echo ""
+        echo "=== Running all tests together ==="
+        pytest -v --tb=long
