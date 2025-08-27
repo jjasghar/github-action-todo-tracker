@@ -1,0 +1,89 @@
+name: Debug Test
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  debug-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    
+    - name: Debug environment
+      run: |
+        echo "=== Environment Information ==="
+        python --version
+        pip --version
+        which python
+        which pip
+        echo ""
+        echo "=== Repository Structure ==="
+        ls -la
+        echo ""
+        echo "=== Source Structure ==="
+        ls -la src/
+        echo ""
+        echo "=== Test Structure ==="
+        ls -la tests/
+        echo ""
+        echo "=== Requirements Files ==="
+        echo "requirements.txt:"
+        cat requirements.txt
+        echo ""
+        echo "requirements-dev.txt:"
+        cat requirements-dev.txt
+        echo ""
+        echo "pyproject.toml exists:" 
+        ls -la pyproject.toml || echo "No pyproject.toml"
+        echo ""
+        echo "pytest.ini exists:"
+        ls -la pytest.ini || echo "No pytest.ini"
+    
+    - name: Install dependencies step by step
+      run: |
+        echo "=== Upgrading pip ==="
+        python -m pip install --upgrade pip setuptools wheel
+        echo ""
+        echo "=== Installing runtime dependencies ==="
+        pip install -r requirements.txt
+        echo ""
+        echo "=== Installing dev dependencies ==="
+        pip install -r requirements-dev.txt
+        echo ""
+        echo "=== Installing package in editable mode ==="
+        pip install -e .
+        echo ""
+        echo "=== Final package list ==="
+        pip list
+    
+    - name: Test basic functionality
+      run: |
+        echo "=== Testing pytest installation ==="
+        pytest --version
+        echo ""
+        echo "=== Testing basic imports ==="
+        python -c "import todo_tracker; print('✅ todo_tracker imports')"
+        python -c "import todo_tracker.scanner; print('✅ scanner imports')"
+        python -c "import todo_tracker.github_client; print('✅ github_client imports')"
+        python -c "import todo_tracker.cli; print('✅ cli imports')"
+        echo ""
+        echo "=== Testing pytest collection ==="
+        pytest --collect-only
+    
+    - name: Run basic tests only
+      run: |
+        echo "=== Running basic validation tests ==="
+        pytest tests/test_basic.py -v
+    
+    - name: Run all tests
+      run: |
+        echo "=== Running all tests ==="
+        pytest -v --tb=short

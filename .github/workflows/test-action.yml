@@ -24,12 +24,35 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
         pip install -e .
-        pip install "pytest>=7.4.0" "pytest-cov>=4.1.0" "black>=23.0.0"
+    
+    - name: Debug installation
+      run: |
+        echo "Python version:"
+        python --version
+        echo "Pip list:"
+        pip list
+        echo "Pytest version:"
+        pytest --version || echo "pytest not found"
+        echo "Project structure:"
+        ls -la
+        echo "Source structure:"
+        ls -la src/
+        echo "Test structure:"
+        ls -la tests/
+        echo "Current directory:"
+        pwd
+    
+    - name: Test import
+      run: |
+        python -c "import sys; print('Python path:'); [print(p) for p in sys.path]"
+        python -c "import todo_tracker; print('✅ todo_tracker imports successfully')" || echo "❌ todo_tracker import failed"
     
     - name: Run tests
       run: |
-        pytest
+        pytest -v --tb=short
 
   test-action:
     runs-on: ubuntu-latest
