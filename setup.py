@@ -13,12 +13,12 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="github-action-todo-tracker",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="jjasghar",
+    author_email="jjasghar@gmail.com",
     description="A tool to scan codebases for TODO comments and create GitHub issues",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/github-action-todo-tracker",
+    url="https://github.com/jjasghar/github-action-todo-tracker",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     classifiers=[

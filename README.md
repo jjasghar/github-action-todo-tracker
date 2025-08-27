@@ -280,10 +280,8 @@ cd github-action-todo-tracker
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\\Scripts\\activate
 
-# Install dependencies
-pip install -r requirements.txt
-pip install -r requirements-dev.txt  # For development/testing
-pip install -e .
+# Install dependencies (includes dev dependencies)
+pip install -e ".[dev]"
 ```
 
 ### Running Tests

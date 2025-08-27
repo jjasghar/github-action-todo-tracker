@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "github-action-todo-tracker"
+version = "0.1.0"
+description = "A tool to scan codebases for TODO comments and create GitHub issues"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "jjasghar", email = "jjasghar@gmail.com"}
+]
+maintainers = [
+    {name = "jjasghar", email = "jjasghar@gmail.com"}
+]
+keywords = ["github", "todo", "issues", "automation", "github-action"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Bug Tracking",
+    "Topic :: Software Development :: Quality Assurance",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "PyGithub>=2.1.1",
+    "click>=8.1.0",
+    "gitpython>=3.1.40",
+    "typing-extensions>=4.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jjasghar/github-action-todo-tracker"
+Documentation = "https://github.com/jjasghar/github-action-todo-tracker#readme"
+Repository = "https://github.com/jjasghar/github-action-todo-tracker.git"
+Issues = "https://github.com/jjasghar/github-action-todo-tracker/issues"
+
+[project.scripts]
+todo-tracker = "todo_tracker.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--tb=short",
+    "--disable-warnings",
+]
+markers = [
+    "integration: marks tests as integration tests",
+    "slow: marks tests as slow",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
