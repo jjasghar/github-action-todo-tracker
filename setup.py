@@ -34,6 +34,7 @@ setup(
     ],
     python_requires=">=3.8",
     install_requires=requirements,
+    zip_safe=False,
     entry_points={
         "console_scripts": [
             "todo-tracker=todo_tracker.cli:cli",
