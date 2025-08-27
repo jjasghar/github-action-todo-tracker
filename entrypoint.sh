@@ -45,7 +45,8 @@ echo "Running TODO Tracker with arguments: ${CMD_ARGS[*]}"
 
 # Run the todo tracker and capture output
 OUTPUT_FILE="/tmp/todo_output.txt"
-todo-tracker track "${CMD_ARGS[@]}" --verbose 2>&1 | tee "${OUTPUT_FILE}"
+EXIT_CODE=0
+todo-tracker track "${CMD_ARGS[@]}" --verbose 2>&1 | tee "${OUTPUT_FILE}" || EXIT_CODE=$?
 
 # Parse output to set GitHub Action outputs
 TODOS_FOUND=$(grep -oP "Total TODOs found: \K\d+" "${OUTPUT_FILE}" || echo "0")
@@ -53,10 +54,28 @@ ISSUES_CREATED=$(grep -oP "Created \K\d+" "${OUTPUT_FILE}" || echo "0")
 ISSUES_SKIPPED=$(grep -oP "Skipped \K\d+" "${OUTPUT_FILE}" || echo "0")
 ISSUES_CLOSED=$(grep -oP "Closed \K\d+" "${OUTPUT_FILE}" || echo "0")
 
-# Set outputs
-echo "todos-found=${TODOS_FOUND}" >> "$GITHUB_OUTPUT"
-echo "issues-created=${ISSUES_CREATED}" >> "$GITHUB_OUTPUT"
-echo "issues-skipped=${ISSUES_SKIPPED}" >> "$GITHUB_OUTPUT"
-echo "issues-closed=${ISSUES_CLOSED}" >> "$GITHUB_OUTPUT"
+# Set outputs even if there was an error
+if [ -n "${GITHUB_OUTPUT}" ]; then
+    echo "todos-found=${TODOS_FOUND}" >> "$GITHUB_OUTPUT"
+    echo "issues-created=${ISSUES_CREATED}" >> "$GITHUB_OUTPUT"
+    echo "issues-skipped=${ISSUES_SKIPPED}" >> "$GITHUB_OUTPUT"
+    echo "issues-closed=${ISSUES_CLOSED}" >> "$GITHUB_OUTPUT"
+else
+    echo "GITHUB_OUTPUT not set, outputs:"
+    echo "todos-found=${TODOS_FOUND}"
+    echo "issues-created=${ISSUES_CREATED}"
+    echo "issues-skipped=${ISSUES_SKIPPED}"
+    echo "issues-closed=${ISSUES_CLOSED}"
+fi
 
-echo "TODO Tracker completed successfully!"
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "TODO Tracker completed successfully!"
+else
+    echo "TODO Tracker completed with exit code: $EXIT_CODE"
+    # For dry runs or expected failures, don't fail the action
+    if [ "${DRY_RUN}" = "true" ]; then
+        echo "Dry run mode - treating as success"
+        exit 0
+    fi
+    exit $EXIT_CODE
+fi
